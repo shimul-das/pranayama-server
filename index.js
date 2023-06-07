@@ -65,6 +65,17 @@ async function run() {
       next();
     }
 
+        ///
+        const verifyStudent = async (req, res, next) => {
+          const email = req.decoded.email;
+          const query = { email: email }
+          const user = await usersCollection.findOne(query);
+          if (user?.role !== 'student') {
+            return res.status(403).send({ error: true, message: 'Forbidden: Access denied' });
+          }
+          next();
+        }
+
 
     // users related apis
     app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
