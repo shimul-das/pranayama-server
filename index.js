@@ -125,6 +125,27 @@ app.get('/users/admin/:email', verifyJWT, async (req, res) => {
   res.send(result);
 });
 
+app.patch('/users/role/:id', async (req, res) => {
+  const id = req.params.id;
+  const { role } = req.body;
+
+  const filter = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      role: role,
+    },
+  };
+
+  try {
+    const result = await usersCollection.updateOne(filter, updateDoc);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error updating user role');
+  }
+});
+
+
 // Student route
 app.get('/users/student/:email', verifyJWT, async (req, res) => {
   const email = req.params.email;
@@ -159,6 +180,51 @@ app.post('/class', verifyJWT, verifyInstructor, async (req, res) => {
   const result = await classCollection.insertOne(newItem)
   res.send(result);
 })
+//get classes
+app.get('/classes',verifyJWT, verifyInstructor, async (req, res) => {
+  const instructorEmail = req.decoded.email;
+
+  const query = { instructorEmail };
+  const classes = await classCollection.find(query).toArray();
+
+  res.send(classes);
+});
+
+// Update class status
+app.patch("/class/:id/status", verifyJWT,verifyAdmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { status } = req.body;
+
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = { $set: { status } };
+
+    const result = await classCollection.updateOne(filter, updateDoc);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Send feedback to instructor
+app.post("/class/:id/feedback", verifyJWT,verifyAdmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { feedback } = req.body;
+
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = { $set: { feedback } };
+
+    const result = await classCollection.updateOne(filter, updateDoc);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
 
 
     
