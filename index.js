@@ -46,6 +46,7 @@ async function run() {
     await client.connect();
 
     const usersCollection = client.db("PranayamaDB").collection("users");
+    const classCollection = client.db("PranayamaDB").collection("classes");
 
     app.post('/jwt', (req, res) => {
       const user = req.body;
@@ -64,6 +65,20 @@ async function run() {
       }
       next();
     }
+
+    ///
+    const verifyInstructor = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      
+      if (user?.role !== 'instructor') {
+        return res.status(403).send({ error: true, message: 'Forbidden: Only instructors can access this resource.' });
+      }
+      
+      next();
+    };
+    
 
         ///
         const verifyStudent = async (req, res, next) => {
@@ -97,7 +112,7 @@ async function run() {
     });
 
 // Admin route
-app.get('/users/admin/:email', async (req, res) => {
+app.get('/users/admin/:email', verifyJWT, async (req, res) => {
   const email = req.params.email;
 
   if (req.decoded.email !== email) {
@@ -111,7 +126,7 @@ app.get('/users/admin/:email', async (req, res) => {
 });
 
 // Student route
-app.get('/users/student/:email', async (req, res) => {
+app.get('/users/student/:email', verifyJWT, async (req, res) => {
   const email = req.params.email;
 
   if (req.decoded.email !== email) {
@@ -125,7 +140,7 @@ app.get('/users/student/:email', async (req, res) => {
 });
 
 // Instructor route
-app.get('/users/instructor/:email', async (req, res) => {
+app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
   const email = req.params.email;
 
   if (req.decoded.email !== email) {
@@ -137,6 +152,13 @@ app.get('/users/instructor/:email', async (req, res) => {
   const result = { instructor: user?.role === 'instructor' };
   res.send(result);
 });
+
+//class add
+app.post('/class', verifyJWT, verifyInstructor, async (req, res) => {
+  const newItem = req.body;
+  const result = await classCollection.insertOne(newItem)
+  res.send(result);
+})
 
 
     
