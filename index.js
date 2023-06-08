@@ -191,7 +191,20 @@ app.get('/classes',verifyJWT, verifyInstructor, async (req, res) => {
 });
 
 // Update class status
-app.patch("/class/:id/status", verifyJWT,verifyAdmin, async (req, res) => {
+app.get('/adminclasses', verifyJWT, verifyAdmin, (req, res) => {
+  classCollection.find({}).toArray()
+    .then(classes => {
+      res.send(classes);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    });
+});
+
+
+// Update class status
+app.patch("/adminclasses/:id/status", verifyJWT,verifyAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     const { status } = req.body;
@@ -207,8 +220,8 @@ app.patch("/class/:id/status", verifyJWT,verifyAdmin, async (req, res) => {
   }
 });
 
-// Send feedback to instructor
-app.post("/class/:id/feedback", verifyJWT,verifyAdmin, async (req, res) => {
+//Send feedback to instructor
+app.post("/adminclasses/:id/feedback", verifyJWT,verifyAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     const { feedback } = req.body;
@@ -223,6 +236,7 @@ app.post("/class/:id/feedback", verifyJWT,verifyAdmin, async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 
 
