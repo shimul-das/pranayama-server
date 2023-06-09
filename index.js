@@ -47,6 +47,7 @@ async function run() {
 
     const usersCollection = client.db("PranayamaDB").collection("users");
     const classCollection = client.db("PranayamaDB").collection("classes");
+    const selectclassCollection = client.db("PranayamaDB").collection("selectclasses");
 
     app.post('/jwt', (req, res) => {
       const user = req.body;
@@ -95,6 +96,16 @@ async function run() {
     // users related apis
     app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
       const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+    //get all instructor
+    app.get('/instructorusers', async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+    //get all classes
+    app.get('/approvedclass', async (req, res) => {
+      const result = await classCollection.find().toArray();
       res.send(result);
     });
 
@@ -237,7 +248,22 @@ app.post("/adminclasses/:id/feedback", verifyJWT,verifyAdmin, async (req, res) =
   }
 });
 
+//stydent path
+//class add
+app.post('/selectclass', verifyJWT, verifyStudent, async (req, res) => {
+  const newItem = req.body;
+  const result = await selectclassCollection.insertOne(newItem)
+  res.send(result);
+})
+//my select class
+app.get('/selectclass', verifyJWT, verifyStudent, async (req, res) => {
+  const studentEmail = req.decoded.email;
 
+  const query = { userEmail: studentEmail };
+  const classes = await selectclassCollection.find(query).toArray();
+
+  res.send(classes);
+});
 
 
 
