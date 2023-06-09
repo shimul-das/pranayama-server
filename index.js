@@ -200,7 +200,25 @@ app.get('/classes',verifyJWT, verifyInstructor, async (req, res) => {
 
   res.send(classes);
 });
+//get specific class for payment
+app.get('/selectclass/:id',verifyJWT,verifyStudent, async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
 
+  try {
+    const selecttItem = await selectclassCollection.findOne(query);
+    if (!selecttItem) {
+      res.status(404).send('Cart item not found.');
+      return;
+    }
+    res.send(selecttItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Failed to retrieve cart item.');
+  }
+});
+
+//
 // Update class status
 app.get('/adminclasses', verifyJWT, verifyAdmin, (req, res) => {
   classCollection.find({}).toArray()
