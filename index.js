@@ -264,6 +264,21 @@ app.get('/selectclass', verifyJWT, verifyStudent, async (req, res) => {
 
   res.send(classes);
 });
+//my select class delete
+app.delete('/selectclass/:classId', verifyJWT, verifyStudent, async (req, res) => {
+  const { classId } = req.params;
+  const studentEmail = req.decoded.email;
+
+  try {
+    // Delete the selected class for the student
+    await selectclassCollection.deleteOne({ _id: classId, studentEmail });
+
+    res.sendStatus(200); // Send a success response back to the client
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Failed to delete selected class");
+  }
+});
 
 
 
