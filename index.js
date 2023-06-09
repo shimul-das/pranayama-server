@@ -48,6 +48,7 @@ async function run() {
     const usersCollection = client.db("PranayamaDB").collection("users");
     const classCollection = client.db("PranayamaDB").collection("classes");
     const selectclassCollection = client.db("PranayamaDB").collection("selectclasses");
+    const paymentsCollection = client.db("PranayamaDB").collection("payments");
 
     app.post('/jwt', (req, res) => {
       const user = req.body;
@@ -314,7 +315,81 @@ app.delete('/selectclass/:classId', verifyJWT, verifyStudent, async (req, res) =
         clientSecret: paymentIntent.client_secret
       })
     })
+    // payment collection related api
+           app.post('/payments', verifyJWT,verifyStudent, async (req, res) => {
+            const payment = req.body;
+            const insertResult = await paymentsCollection.insertOne(payment);
+            res.send(insertResult);
+          })
 
+          app.get('/enrollclasses', verifyJWT, verifyStudent, async (req, res) => {
+            const studentEmail = req.decoded.email;
+          
+            const query = { email: studentEmail };
+            const classes = await paymentsCollection.find(query).toArray();
+          
+            res.send(classes);
+          });
+
+          ///////////////
+          // app.patch('/classes/:id', async (req, res) => {
+          //   const id = req.params.id;
+          //   const { enrolledStudent, availableSeats } = req.body;
+          
+          //   try {
+          //     const updatedClass = await classCollection.findByIdAndUpdate(
+          //       id,
+          //       { $set: { enrolledStudent, availableSeats } },
+          //       { new: true }
+          //     );
+          //     res.json(updatedClass);
+          //   } catch (error) {
+          //     console.error(error);
+          //     res.status(500).json({ error: 'Failed to update class' });
+          //   }
+          // });
+          // app.patch('/classes/:id', jwt, verifyStudent, async (req, res) => {
+          //   const id = req.params.id;
+          //   const { enrolledStudent, availableSeats } = req.body;
+          
+          //   try {
+          //     const updatedClass = await classCollection.updateOne(
+          //       { _id: id },
+          //       { $set: { enrolledStudent, availableSeats } }
+          //     );
+          //     res.json(updatedClass);
+          //   } catch (error) {
+          //     console.error(error);
+          //     res.status(500).json({ error: 'Failed to update class' });
+          //   }
+          // });
+
+          //
+          app.patch('/classes/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = {
+              _id: new ObjectId(id)
+            };
+            const updateclass = req.body;
+            const updateDoc = {
+              $set: {
+                enrolledStudent: updateclass.enrolledStudent,
+                availableSeats: updateclass.availableSeats,
+              },
+            };
+            try {
+              const result = await classCollection.updateOne(filter, updateDoc);
+              res.send(result);
+            } catch (error) {
+              console.error(error);
+              res.status(500).json({ error: 'Failed to update data' });
+            }
+          });
+          
+          
+          
+          
+          
 
 
 
