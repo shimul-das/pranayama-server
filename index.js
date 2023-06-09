@@ -271,7 +271,7 @@ app.delete('/selectclass/:classId', verifyJWT, verifyStudent, async (req, res) =
 
   try {
     // Delete the selected class for the student
-    await selectclassCollection.deleteOne({ _id: classId, studentEmail });
+    await selectclassCollection.deleteOne({ _id: new ObjectId(classId), userEmail: studentEmail });
 
     res.sendStatus(200); // Send a success response back to the client
   } catch (error) {
@@ -279,6 +279,7 @@ app.delete('/selectclass/:classId', verifyJWT, verifyStudent, async (req, res) =
     res.status(500).send("Failed to delete selected class");
   }
 });
+
 
 
 
