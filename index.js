@@ -338,40 +338,6 @@ app.delete('/selectclass/:classId', verifyJWT, verifyStudent, async (req, res) =
             res.send(classes);
           });
 
-          ///////////////
-          // app.patch('/classes/:id', async (req, res) => {
-          //   const id = req.params.id;
-          //   const { enrolledStudent, availableSeats } = req.body;
-          
-          //   try {
-          //     const updatedClass = await classCollection.findByIdAndUpdate(
-          //       id,
-          //       { $set: { enrolledStudent, availableSeats } },
-          //       { new: true }
-          //     );
-          //     res.json(updatedClass);
-          //   } catch (error) {
-          //     console.error(error);
-          //     res.status(500).json({ error: 'Failed to update class' });
-          //   }
-          // });
-          // app.patch('/classes/:id', jwt, verifyStudent, async (req, res) => {
-          //   const id = req.params.id;
-          //   const { enrolledStudent, availableSeats } = req.body;
-          
-          //   try {
-          //     const updatedClass = await classCollection.updateOne(
-          //       { _id: id },
-          //       { $set: { enrolledStudent, availableSeats } }
-          //     );
-          //     res.json(updatedClass);
-          //   } catch (error) {
-          //     console.error(error);
-          //     res.status(500).json({ error: 'Failed to update class' });
-          //   }
-          // });
-
-          //
           app.patch('/classes/:id', async (req, res) => {
             const id = req.params.id;
             const filter = {
