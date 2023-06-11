@@ -43,7 +43,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    client.connect();
 
     const usersCollection = client.db("PranayamaDB").collection("users");
     const classCollection = client.db("PranayamaDB").collection("classes");
@@ -218,6 +218,24 @@ app.get('/selectclass/:id',verifyJWT,verifyStudent, async (req, res) => {
     res.status(500).send('Failed to retrieve cart item.');
   }
 });
+/////For delete
+app.delete('/selectclass/:id', verifyJWT, verifyStudent, async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+
+  try {
+    const deleteResult = await selectclassCollection.deleteOne(query);
+    if (deleteResult.deletedCount === 0) {
+      res.status(404).send('Cart item not found.');
+      return;
+    }
+    res.send('Cart item deleted successfully.');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Failed to delete cart item.');
+  }
+});
+
 
 //
 // Update class status
