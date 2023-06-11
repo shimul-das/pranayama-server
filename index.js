@@ -376,15 +376,18 @@ app.delete('/selectclass/:classId', verifyJWT, verifyStudent, async (req, res) =
               res.status(500).json({ error: 'Failed to update data' });
             }
           });
-          
-          
-          
-          
-          
 
 
-
-    
+      ///payment History for student
+      app.get('/paymenthistory', verifyJWT, verifyStudent, async (req, res) => {
+        const studentEmail = req.decoded.email;
+      
+        const query = { email: studentEmail };
+        const classes = await paymentsCollection.find(query).toArray();
+      
+        res.send(classes);
+      });
+      
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
